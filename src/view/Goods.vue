@@ -18,6 +18,7 @@
         </div>
         <div>
             <el-table :data="dataList.comList" border style="width: 100%">
+                <!-- <el-table :data="dataList.comList" border style="width: 100%"> -->
                 <el-table-column prop="id" label="ID" width="180" />
                 <el-table-column prop="title" label="标题" width="180" />
                 <el-table-column prop="introduce" label="详情" />
@@ -26,36 +27,30 @@
         <el-pagination @current-change='currentChange' @size-change="sizeChange" layout="prev, pager, next"
             :total="selectData.count * 2" />
     </div>
-    <p>{{count}}</p>
-    <p>{{bar}}</p>
-    <p>{{main.count10}}</p>
-    <button @click="test">测试</button>
+
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, computed, onBeforeMount ,watch} from 'vue'
+import { defineComponent, reactive, toRefs, computed, onMounted ,watch,} from 'vue'
 import { getGoodsList } from '../request/api'
 import { InitData, ListInt } from '../type/good'
-import {userMainStore } from '../store/index'
-import {storeToRefs} from 'pinia'
+import { goodsStore } from '../store/goods'
+
 export default defineComponent({
     setup() {
         const data = reactive(new InitData())
-        const main = userMainStore()
-        const {bar ,count} = storeToRefs(main)
+        const goods = goodsStore()
+      
         const getdata = async()=>{
             const result = await getGoodsList()
             data.list = result.data
             data.selectData.count = result.data.length
+            console.log(data.list)
         }
-        // getGoodsList().then((res)=>{
-        //     data.list=res.data
-        //     data.selectData.count=res.data.length
-        // }
-        // )
         // 截取分页数据
         const dataList = reactive({
             comList: computed(() => {
+                
                 return data.list.slice((data.selectData.page - 1) * data.selectData.pagesize, data.selectData.page * data.selectData.pagesize)
             })
         })
@@ -67,14 +62,11 @@ export default defineComponent({
             data.selectData.pagesize = pagesize
         }
         // 获得数据
-        onBeforeMount(() => {
+        onMounted(() => {
+            goods.getGood()
+            console.log(goods.list)
             getdata()
-            // const result = await getGoodsList()
-            // data.list = result.data
-            // data.selectData.count = result.data.length
-            //     console.log(result);
-
-
+            console.log("触发")
         })
         // 查询
         const onSubmit = () => {
@@ -124,9 +116,9 @@ export default defineComponent({
             // })
 
             // 逻辑
-            main.change()
+            // main.change()
         }
-        return { ...toRefs(data), currentChange, sizeChange, dataList, onSubmit ,unSubmit,main,count,bar,test}
+        return { ...toRefs(data), currentChange, sizeChange, dataList, onSubmit ,unSubmit,goods,dataList}
     }
 
 })

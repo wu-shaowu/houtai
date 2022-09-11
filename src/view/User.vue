@@ -75,8 +75,10 @@ import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { getUserList, getRoleList } from '../request/api'
 import { LoginData } from '../type/login';
 import { InitData, ListInt } from '../type/user';
+import { userStore} from '../store/user'
 export default defineComponent({
     setup() {
+        const user = userStore()
         const data = reactive(new InitData)
         const getuser = async () => {
             const result = await getUserList()
@@ -90,6 +92,7 @@ export default defineComponent({
         }
 
         onMounted(() => {
+            user.getUser()
             getuser();
             console.log(data.selectData);
 
@@ -166,7 +169,7 @@ export default defineComponent({
           data.isShow=false
             
         }
-        return { ...toRefs(data), onsubmit, unsubmit, changeUser ,undataUser,quexiao}
+        return { ...toRefs(data), onsubmit, unsubmit, changeUser ,undataUser,quexiao,user}
     }
 })
 </script>
